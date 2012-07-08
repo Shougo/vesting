@@ -35,8 +35,12 @@ endfunction"}}}
 let s:source = {
       \ 'name' : 'vesting',
       \ 'description' : 'test candidate from vesting',
+      \ 'hooks' : {},
       \}
 
+function! s:source.hooks.on_init(args, context)"{{{
+  call vesting#load()
+endfunction"}}}
 function! s:source.gather_candidates(args, context)"{{{
   if empty(a:args)
     return []
