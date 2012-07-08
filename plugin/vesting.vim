@@ -44,8 +44,8 @@ command! -nargs=+ Should
       \ call vesting#should(<q-args>, eval(<q-args>))
 command! -nargs=0 End
       \ call vesting#end()
-command! Fin
-      \ call vesting#fin
+command! -nargs=0 Fin
+      \ call vesting#fin()
 
 
 let g:loaded_vesting = 1

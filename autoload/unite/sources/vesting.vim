@@ -1,6 +1,6 @@
 "=============================================================================
 " FILE: vesting.vim
-" AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
+" AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
 " Last Modified: 08 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
@@ -24,53 +24,37 @@
 " }}}
 "=============================================================================
 
-" Saving 'cpoptions' {{{
 let s:save_cpo = &cpo
 set cpo&vim
-" }}}
 
-let s:results = {}
-let s:context_stack = []
+function! unite#sources#vesting#define()"{{{
+  return s:source
+endfunction"}}}
 
-function! vesting#should(cond, result)
-  " FIXME: validate
-  let it = s:context_stack[-1][1]
-  let context = s:context_stack[-2][1]
-  if !has_key(s:results, context)
-    let s:results[context] = []
+let s:source = {
+      \ 'name' : 'vesting',
+      \ 'description' : 'test candidate from vesting',
+      \}
+
+function! s:source.gather_candidates(args, context)"{{{
+  if empty(a:args)
+    return []
   endif
-  call add(s:results[context], a:result ? '.' :
-        \ printf('It %s : %s', it, a:cond))
-endfunction
 
-function! s:_should(it, cond)
-  echo a:cond
-  echo eval(a:cond)
-  return eval(a:cond) ? '.' : a:it
-endfunction
+  let dir = join(a:args, ':')
+  let results = []
+  for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
+    source `=vest`
+    call add(results, vesting#get_result())
+  endfor
 
-function! vesting#context(args)
-  call add(s:context_stack, ['c', a:args])
-endfunction
+  return map(results, "{
+        \ 'word' : v:val,
+        \ }
+        \")
+endfunction"}}}
 
-function! vesting#it(args)
-  call add(s:context_stack, ['i', a:args])
-endfunction
-
-function! vesting#end()
-  call remove(s:context_stack, -1)
-  redraw!
-endfunction
-
-function! vesting#fin()
-endfunction
-
-function! vesting#get_result()
-  return string(s:results)
-endfunction
-
-" Restore 'cpoptions' {{{
 let &cpo = s:save_cpo
 unlet s:save_cpo
-" }}}
+
 " vim: foldmethod=marker
