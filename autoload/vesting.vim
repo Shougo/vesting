@@ -29,10 +29,24 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
+command! -nargs=+ Context
+      \ call vesting#context(<q-args>)
+command! -nargs=+ It
+      \ call vesting#it(<q-args>)
+command! -nargs=+ Should
+      \ call vesting#should(<q-args>, eval(<q-args>))
+command! -nargs=0 End
+      \ call vesting#end()
+command! -nargs=0 Fin
+      \ call vesting#fin()
+
 let s:results = {}
 let s:context_stack = []
 
-function! vesting#should(cond, result)
+function! vesting#load()"{{{
+endfunction"}}}
+
+function! vesting#should(cond, result)"{{{
   " FIXME: validate
   let it = s:context_stack[-1][1]
   let context = s:context_stack[-2][1]
@@ -41,13 +55,13 @@ function! vesting#should(cond, result)
   endif
   call add(s:results[context], a:result ? '.' :
         \ printf('It %s : %s', it, a:cond))
-endfunction
+endfunction"}}}
 
-function! s:_should(it, cond)
+function! s:_should(it, cond)"{{{
   echo a:cond
   echo eval(a:cond)
   return eval(a:cond) ? '.' : a:it
-endfunction
+endfunction"}}}
 
 function! vesting#context(args)
   call add(s:context_stack, ['c', a:args])
@@ -65,9 +79,9 @@ endfunction
 function! vesting#fin()
 endfunction
 
-function! vesting#get_result()
+function! vesting#get_result()"{{{
   return string(s:results)
-endfunction
+endfunction"}}}
 
 " Restore 'cpoptions' {{{
 let &cpo = s:save_cpo

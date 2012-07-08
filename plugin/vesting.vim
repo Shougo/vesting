@@ -36,18 +36,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-command! -nargs=+ Context
-      \ call vesting#context(<q-args>)
-command! -nargs=+ It
-      \ call vesting#it(<q-args>)
-command! -nargs=+ Should
-      \ call vesting#should(<q-args>, eval(<q-args>))
-command! -nargs=0 End
-      \ call vesting#end()
-command! -nargs=0 Fin
-      \ call vesting#fin()
-
-
 let g:loaded_vesting = 1
 
 " Restore 'cpoptions' {{{

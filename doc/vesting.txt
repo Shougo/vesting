@@ -81,6 +81,7 @@ CHANGELOG					*vesting-changelog*
 - Added commands.
 - Added test.
 - Added unite source.
+- Improved versing source.
 
 2012-06-17
 - Inital version.

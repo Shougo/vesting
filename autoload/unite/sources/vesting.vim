@@ -28,6 +28,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! unite#sources#vesting#define()"{{{
+  call vesting#load()
   return s:source
 endfunction"}}}
 
@@ -52,6 +53,10 @@ function! s:source.gather_candidates(args, context)"{{{
         \ 'word' : v:val,
         \ }
         \")
+endfunction"}}}
+function! s:source.complete(args, context, arglead, cmdline, cursorpos)"{{{
+  return unite#sources#file#complete_directory(
+        \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
 endfunction"}}}
 
 let &cpo = s:save_cpo
