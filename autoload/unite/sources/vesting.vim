@@ -36,10 +36,16 @@ let s:source = {
       \ 'name' : 'vesting',
       \ 'description' : 'test candidate from vesting',
       \ 'hooks' : {},
+      \ 'syntax' : 'uniteSource__Vesting',
       \}
 
 function! s:source.hooks.on_init(args, context)"{{{
   call vesting#load()
+endfunction"}}}
+function! s:source.hooks.on_syntax(args, context)"{{{
+  syntax match uniteSource__VestingError /.*:.*$/
+        \ contained containedin=uniteSource__Vesting
+  highlight default link uniteSource__VestingError ErrorMsg
 endfunction"}}}
 function! s:source.gather_candidates(args, context)"{{{
   if empty(a:args)
@@ -49,7 +55,13 @@ function! s:source.gather_candidates(args, context)"{{{
   let dir = join(a:args, ':')
   let results = []
   for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
-    source `=vest`
+    try
+      source `=vest`
+    catch
+      call add(results, { 'linenr' : 0, 'file' : vest,
+            \ 'text' : printf('%s: %s: %s',
+            \ vest, v:exception, v:errmsg) })
+    endtry
 
     for result  in values(vesting#get_result())
       let results += result

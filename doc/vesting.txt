@@ -79,6 +79,7 @@ CHANGELOG					*vesting-changelog*
 
 2012-07-15
 - Improved unite source.
+- Improved for errors.
 
 2012-07-08
 - Added commands.
