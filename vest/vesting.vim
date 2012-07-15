@@ -10,6 +10,7 @@ set cpo&vim
 Context Vesting.run()
   It check is true?
     Should 1 == 1
+    Should 1 == 0
   End
 End
 

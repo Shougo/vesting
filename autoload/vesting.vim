@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 08 Jul 2012.
+" Last Modified: 15 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -34,27 +34,40 @@ command! -nargs=+ Context
 command! -nargs=+ It
       \ call vesting#it(<q-args>)
 command! -nargs=+ Should
-      \ call vesting#should(<q-args>, eval(<q-args>))
+      \ call vesting#should(<q-args>,
+      \ { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') })
 command! -nargs=0 End
       \ call vesting#end()
 command! -nargs=0 Fin
       \ call vesting#fin()
 
-let s:results = {}
-let s:context_stack = []
-
 function! vesting#load()"{{{
+  let s:results = {}
+  let s:context_stack = []
 endfunction"}}}
 
-function! vesting#should(cond, result)"{{{
+function! vesting#should(cond, context)"{{{
   " FIXME: validate
   let it = s:context_stack[-1][1]
   let context = s:context_stack[-2][1]
   if !has_key(s:results, context)
     let s:results[context] = []
   endif
-  call add(s:results[context], a:result ? '.' :
-        \ printf('It %s : %s', it, a:cond))
+
+  try
+    let result = eval(a:cond)
+  catch
+    call add(s:results[context],
+        \ printf('%s:%d: %s',
+        \ a:context.file, a:context.linenr, v:exception, v:errmsg))
+  endtry
+
+  let text = result ? '.' :
+        \ printf('%s:%d: It %s : %s',
+        \ a:context.file, a:context.linenr, it, a:cond)
+  call add(s:results[context],
+        \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
+        \   'text' : text })
 endfunction"}}}
 
 function! s:_should(it, cond)"{{{
@@ -80,7 +93,7 @@ function! vesting#fin()
 endfunction
 
 function! vesting#get_result()"{{{
-  return string(s:results)
+  return s:results
 endfunction"}}}
 
 " Restore 'cpoptions' {{{

@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 08 Jul 2012.
+" Last Modified: 15 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -50,11 +50,18 @@ function! s:source.gather_candidates(args, context)"{{{
   let results = []
   for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
     source `=vest`
-    call add(results, vesting#get_result())
+
+    for result  in values(vesting#get_result())
+      let results += result
+    endfor
   endfor
 
   return map(results, "{
-        \ 'word' : v:val,
+        \ 'word': v:val.text,
+        \ 'kind': 'jump_list',
+        \ 'action__path': v:val.file,
+        \ 'action__line': v:val.linenr,
+        \ 'action__text': v:val.text,
         \ }
         \")
 endfunction"}}}
