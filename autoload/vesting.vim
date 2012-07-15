@@ -58,12 +58,12 @@ function! vesting#should(cond, context)"{{{
     let result = eval(a:cond)
   catch
     call add(s:results[context],
-        \ printf('%s:%d: %s : %s',
+        \ printf('[Error] %s:%d: %s : %s',
         \ a:context.file, a:context.linenr, v:exception, v:errmsg))
   endtry
 
-  let text = result ? '.' :
-        \ printf('%s:%d: It %s : %s',
+  let text = result ? '[OK]    .' :
+        \ printf('[Fail]  %s:%d: It %s : %s',
         \ a:context.file, a:context.linenr, it, a:cond)
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr, 'file' : a:context.file,

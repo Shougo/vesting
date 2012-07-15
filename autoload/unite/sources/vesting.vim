@@ -46,6 +46,10 @@ function! s:source.hooks.on_syntax(args, context)"{{{
   syntax match uniteSource__VestingError /.*:.*$/
         \ contained containedin=uniteSource__Vesting
   highlight default link uniteSource__VestingError ErrorMsg
+
+  syntax match uniteSource__VestingFilename /\[Vest\].*$/
+        \ contained containedin=uniteSource__Vesting
+  highlight default link uniteSource__VestingFilename Comment
 endfunction"}}}
 function! s:source.gather_candidates(args, context)"{{{
   if empty(a:args)
@@ -54,13 +58,16 @@ function! s:source.gather_candidates(args, context)"{{{
 
   let dir = join(a:args, ':')
   let results = []
+  let candidates = []
+
   for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
+    call add(candidates, { 'word' : '[Vest]  ' . vest, 'is_dummy' : 1})
     try
       source `=vest`
     catch
       call add(results, { 'linenr' : 0, 'file' : vest,
-            \ 'text' : printf('%s: %s: %s',
-            \ vest, v:exception, v:errmsg) })
+            \ 'text' : printf('[Error] %s: %s: %s',
+            \ vest, v:throwpoint, v:exception) })
     endtry
 
     for result  in values(vesting#get_result())
@@ -68,7 +75,7 @@ function! s:source.gather_candidates(args, context)"{{{
     endfor
   endfor
 
-  return map(results, "{
+  let candidates += map(results, "{
         \ 'word': v:val.text,
         \ 'kind': 'jump_list',
         \ 'action__path': v:val.file,
@@ -76,6 +83,8 @@ function! s:source.gather_candidates(args, context)"{{{
         \ 'action__text': v:val.text,
         \ }
         \")
+
+  return candidates
 endfunction"}}}
 function! s:source.complete(args, context, arglead, cmdline, cursorpos)"{{{
   return unite#sources#file#complete_directory(
