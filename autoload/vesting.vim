@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 15 Jul 2012.
+" Last Modified: 18 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -56,23 +56,21 @@ function! vesting#should(cond, context)"{{{
 
   try
     let result = eval(a:cond)
+
+    let text = result ? '[OK]    .' :
+          \ printf('[Fail]  %s:%d: It %s : %s',
+          \ a:context.file, a:context.linenr, it, a:cond)
   catch
-    call add(s:results[context],
-        \ printf('[Error] %s:%d: %s : %s',
-        \ a:context.file, a:context.linenr, v:exception, v:errmsg))
+    let text = printf('[Error] %s:%d: %s : %s',
+        \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
   endtry
 
-  let text = result ? '[OK]    .' :
-        \ printf('[Fail]  %s:%d: It %s : %s',
-        \ a:context.file, a:context.linenr, it, a:cond)
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
         \   'text' : text })
 endfunction"}}}
 
 function! s:_should(it, cond)"{{{
-  echo a:cond
-  echo eval(a:cond)
   return eval(a:cond) ? '.' : a:it
 endfunction"}}}
 
