@@ -47,6 +47,9 @@ command! -nargs=0 Fin
       \ call vesting#fin()
 
 function! vesting#load()"{{{
+endfunction"}}}
+
+function! vesting#init()"{{{
   let s:results = {}
   let s:context_stack = []
 endfunction"}}}
