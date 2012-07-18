@@ -34,8 +34,13 @@ command! -nargs=+ Context
 command! -nargs=+ It
       \ call vesting#it(<q-args>)
 command! -nargs=+ Should
-      \ call vesting#should(<q-args>,
-      \ { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') })
+      \ try |
+      \   call vesting#should(eval(<q-args>), <q-args>,
+      \    { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') }, 0) |
+      \ catch |
+      \   call vesting#should('', '',
+      \    { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') }, 1) |
+      \ endtry
 command! -nargs=0 End
       \ call vesting#end()
 command! -nargs=0 Fin
@@ -46,7 +51,7 @@ function! vesting#load()"{{{
   let s:context_stack = []
 endfunction"}}}
 
-function! vesting#should(cond, context)"{{{
+function! vesting#should(result, cond, context, is_error)"{{{
   " FIXME: validate
   let it = s:context_stack[-1][1]
   let context = s:context_stack[-2][1]
@@ -54,24 +59,18 @@ function! vesting#should(cond, context)"{{{
     let s:results[context] = []
   endif
 
-  try
-    let result = eval(a:cond)
-
-    let text = result ? '[OK]    .' :
-          \ printf('[Fail]  %s:%d: It %s : %s',
-          \ a:context.file, a:context.linenr, it, a:cond)
-  catch
+  if a:is_error
     let text = printf('[Error] %s:%d: %s : %s',
         \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
-  endtry
+  else
+    let text = a:result ? '[OK]    .' :
+          \ printf('[Fail]  %s:%d: It %s : %s',
+          \ a:context.file, a:context.linenr, it, a:cond)
+  endif
 
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
         \   'text' : text })
-endfunction"}}}
-
-function! s:_should(it, cond)"{{{
-  return eval(a:cond) ? '.' : a:it
 endfunction"}}}
 
 function! vesting#context(args)

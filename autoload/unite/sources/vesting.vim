@@ -70,19 +70,20 @@ function! s:source.gather_candidates(args, context)"{{{
             \ vest, v:throwpoint, v:exception) })
     endtry
 
+    let results = []
     for result  in values(vesting#get_result())
       let results += result
     endfor
-  endfor
 
-  let candidates += map(results, "{
-        \ 'word': v:val.text,
-        \ 'kind': 'jump_list',
-        \ 'action__path': v:val.file,
-        \ 'action__line': v:val.linenr,
-        \ 'action__text': v:val.text,
-        \ }
-        \")
+    let candidates += map(results, "{
+          \ 'word': v:val.text,
+          \ 'kind': 'jump_list',
+          \ 'action__path': v:val.file,
+          \ 'action__line': v:val.linenr,
+          \ 'action__text': v:val.text,
+          \ }
+          \")
+  endfor
 
   return candidates
 endfunction"}}}

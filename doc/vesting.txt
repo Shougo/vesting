@@ -79,6 +79,7 @@ CHANGELOG					*vesting-changelog*
 
 2012-07-18
 - Deleted echo.
+- Fixed unite source.
 
 2012-07-15
 - Improved unite source.
