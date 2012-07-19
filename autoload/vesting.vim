@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 18 Jul 2012.
+" Last Modified: 19 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -30,9 +30,11 @@ set cpo&vim
 " }}}
 
 command! -nargs=+ Context
-      \ call vesting#context(<q-args>)
+      \ call vesting#context(<q-args>,
+      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
 command! -nargs=+ It
-      \ call vesting#it(<q-args>)
+      \ call vesting#it(<q-args>,
+      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
 command! -nargs=+ Should
       \ try |
       \   call vesting#should(eval(<q-args>), <q-args>,
@@ -41,6 +43,7 @@ command! -nargs=+ Should
       \   call vesting#should('', '',
       \    { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') }, 1) |
       \ endtry
+command! -nargs=+ Raises
 command! -nargs=0 End
       \ call vesting#end()
 command! -nargs=0 Fin
@@ -55,9 +58,8 @@ function! vesting#init()"{{{
 endfunction"}}}
 
 function! vesting#should(result, cond, context, is_error)"{{{
-  " FIXME: validate
-  let it = s:context_stack[-1][1]
-  let context = s:context_stack[-2][1]
+  let it = s:context_stack[-1].args
+  let context = s:context_stack[-2].args
   if !has_key(s:results, context)
     let s:results[context] = []
   endif
@@ -76,12 +78,16 @@ function! vesting#should(result, cond, context, is_error)"{{{
         \   'text' : text })
 endfunction"}}}
 
-function! vesting#context(args)
-  call add(s:context_stack, ['c', a:args])
+function! vesting#context(args, context)
+  let context = extend(copy(a:context),
+        \ {'mode' : 'context', 'args' : a:args})
+  call add(s:context_stack, context)
 endfunction
 
-function! vesting#it(args)
-  call add(s:context_stack, ['i', a:args])
+function! vesting#it(args, context)
+  let context = extend(copy(a:context),
+        \ {'mode' : 'it', 'args' : a:args})
+  call add(s:context_stack, context)
 endfunction
 
 function! vesting#end()
