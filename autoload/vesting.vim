@@ -45,16 +45,20 @@ command! -nargs=+ Should
       \ endtry
 command! -nargs=+ Raises
 command! -nargs=0 End
-      \ call vesting#end()
+      \ call vesting#end(
+      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
 command! -nargs=0 Fin
-      \ call vesting#fin()
+      \ call vesting#fin(
+      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
 
 function! vesting#load()"{{{
 endfunction"}}}
 
 function! vesting#init()"{{{
   let s:results = {}
-  let s:context_stack = []
+  let s:context_stack = [
+        \ { 'mode' : '', 'args' : '',
+        \   'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')}]
 endfunction"}}}
 
 function! vesting#should(result, cond, context, is_error)"{{{
@@ -78,28 +82,32 @@ function! vesting#should(result, cond, context, is_error)"{{{
         \   'text' : text })
 endfunction"}}}
 
-function! vesting#context(args, context)
+function! vesting#context(args, context)"{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'context', 'args' : a:args})
   call add(s:context_stack, context)
-endfunction
+endfunction"}}}
 
-function! vesting#it(args, context)
+function! vesting#it(args, context)"{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'it', 'args' : a:args})
   call add(s:context_stack, context)
-endfunction
+endfunction"}}}
 
-function! vesting#end()
+function! vesting#end(context)"{{{
   call remove(s:context_stack, -1)
   redraw!
-endfunction
+endfunction"}}}
 
-function! vesting#fin()
+function! vesting#fin(context)
 endfunction
 
 function! vesting#get_result()"{{{
   return s:results
+endfunction"}}}
+
+function! vesting#get_context()"{{{
+  return s:context_stack[-1]
 endfunction"}}}
 
 " Restore 'cpoptions' {{{

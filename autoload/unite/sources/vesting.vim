@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 18 Jul 2012.
+" Last Modified: 19 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -64,15 +64,18 @@ function! s:source.gather_candidates(args, context)"{{{
     call vesting#init()
 
     call add(candidates, { 'word' : '[Vest]  ' . vest, 'is_dummy' : 1})
+
+    let results = []
+
     try
       source `=vest`
     catch
-      call add(results, { 'linenr' : 0, 'file' : vest,
-            \ 'text' : printf('[Error] %s: %s: %s',
-            \ vest, v:throwpoint, v:exception) })
+      let context = copy(vesting#get_context())
+      let context.text = printf('[Error] %s: %s: %s',
+            \ vest, v:throwpoint, v:exception)
+      call add(results, context)
     endtry
 
-    let results = []
     for result  in values(vesting#get_result())
       let results += result
     endfor

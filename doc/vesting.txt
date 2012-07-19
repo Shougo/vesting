@@ -79,6 +79,7 @@ CHANGELOG					*vesting-changelog*
 
 2012-07-19
 - Improved context stack.
+- Fixed error results.
 
 2012-07-18
 - Deleted echo.
