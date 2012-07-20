@@ -41,23 +41,26 @@ command! -nargs=+ Should
       \ try |
       \   call vesting#should(eval(<q-args>), <q-args>,
       \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}, 0, 0) |
+      \     'file' : expand('<sfile>')}, 0) |
       \ catch |
-      \   call vesting#should('', '',
+      \   call vesting#error(
       \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}, 1, 0) |
+      \     'file' : expand('<sfile>')}) |
       \ endtry
 command! -nargs=+ ShouldNot
       \ try |
       \   call vesting#should(eval(<q-args>), <q-args>,
       \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}, 0, 1) |
+      \     'file' : expand('<sfile>')}, 1) |
       \ catch |
-      \   call vesting#should('', '',
+      \   call vesting#error(
       \     { 'linenr' : expand('<slnum>'),
-      \       'file' : expand('<sfile>')}, 1, 1) |
+      \     'file' : expand('<sfile>')}) |
       \ endtry
 command! -nargs=+ Raises
+      \  call vesting#raises(<q-args>,
+      \     { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')})
 command! -nargs=0 End
       \ call vesting#end(
       \   { 'linenr' : expand('<slnum>'),
@@ -77,26 +80,35 @@ function! vesting#init()"{{{
         \   'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')}]
 endfunction"}}}
 
-function! vesting#should(result, cond, context, is_error, is_not)"{{{
+function! vesting#should(result, cond, context, is_not)"{{{
   let it = s:context_stack[-1].args
   let context = s:context_stack[-2].args
   if !has_key(s:results, context)
     let s:results[context] = []
   endif
 
-  if a:is_error
-    let text = printf('[Error] %s:%d: %s : %s',
-        \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
-  else
-    let result = a:result
-    if a:is_not
-      let result = !result
-    endif
-    let text = result ? '[OK]    .' :
-          \ printf('[Fail]  %s:%d: It %s : %s',
-          \ a:context.file, a:context.linenr, it, a:cond)
+  let result = a:result
+  if a:is_not
+    let result = !result
+  endif
+  let text = result ? '[OK]    .' :
+        \ printf('[Fail]  %s:%d: It %s : %s',
+        \ a:context.file, a:context.linenr, it, a:cond)
+
+  call add(s:results[context],
+        \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
+        \   'text' : text })
+endfunction"}}}
+
+function! vesting#error(context)"{{{
+  let it = s:context_stack[-1].args
+  let context = s:context_stack[-2].args
+  if !has_key(s:results, context)
+    let s:results[context] = []
   endif
 
+  let text = printf('[Error] %s:%d: %s : %s',
+        \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
         \   'text' : text })
@@ -104,13 +116,15 @@ endfunction"}}}
 
 function! vesting#context(args, context)"{{{
   let context = extend(copy(a:context),
-        \ {'mode' : 'context', 'args' : a:args})
+        \ {'mode' : 'context', 'args' : a:args,
+        \  'execption' : '', 'is_caught' : 0})
   call add(s:context_stack, context)
 endfunction"}}}
 
 function! vesting#it(args, context)"{{{
   let context = extend(copy(a:context),
-        \ {'mode' : 'it', 'args' : a:args})
+        \ {'mode' : 'it', 'args' : a:args,
+        \  'execption' : '', 'is_caught' : 0})
   call add(s:context_stack, context)
 endfunction"}}}
 
@@ -128,10 +142,6 @@ endfunction"}}}
 
 function! vesting#get_context()"{{{
   return s:context_stack[-1]
-endfunction"}}}
-
-function! s:get_default_context()"{{{
-  return 
 endfunction"}}}
 
 " Restore 'cpoptions' {{{

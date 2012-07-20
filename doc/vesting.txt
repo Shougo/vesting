@@ -79,6 +79,7 @@ CHANGELOG					*vesting-changelog*
 
 2012-07-20
 - Added :ShouldNot command.
+- Improved for execption.
 
 2012-07-19
 - Improved context stack.
