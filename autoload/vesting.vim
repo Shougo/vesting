@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 19 Jul 2012.
+" Last Modified: 20 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -31,25 +31,41 @@ set cpo&vim
 
 command! -nargs=+ Context
       \ call vesting#context(<q-args>,
-      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
+      \   { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')})
 command! -nargs=+ It
       \ call vesting#it(<q-args>,
-      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
+      \   { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')})
 command! -nargs=+ Should
       \ try |
       \   call vesting#should(eval(<q-args>), <q-args>,
-      \    { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') }, 0) |
+      \     { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')}, 0, 0) |
       \ catch |
       \   call vesting#should('', '',
-      \    { 'linenr' : expand('<slnum>'),  'file' : expand('<sfile>') }, 1) |
+      \     { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')}, 1, 0) |
+      \ endtry
+command! -nargs=+ ShouldNot
+      \ try |
+      \   call vesting#should(eval(<q-args>), <q-args>,
+      \     { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')}, 0, 1) |
+      \ catch |
+      \   call vesting#should('', '',
+      \     { 'linenr' : expand('<slnum>'),
+      \       'file' : expand('<sfile>')}, 1, 1) |
       \ endtry
 command! -nargs=+ Raises
 command! -nargs=0 End
       \ call vesting#end(
-      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
+      \   { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')})
 command! -nargs=0 Fin
       \ call vesting#fin(
-      \   { 'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')})
+      \   { 'linenr' : expand('<slnum>'),
+      \     'file' : expand('<sfile>')})
 
 function! vesting#load()"{{{
 endfunction"}}}
@@ -61,7 +77,7 @@ function! vesting#init()"{{{
         \   'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')}]
 endfunction"}}}
 
-function! vesting#should(result, cond, context, is_error)"{{{
+function! vesting#should(result, cond, context, is_error, is_not)"{{{
   let it = s:context_stack[-1].args
   let context = s:context_stack[-2].args
   if !has_key(s:results, context)
@@ -72,7 +88,11 @@ function! vesting#should(result, cond, context, is_error)"{{{
     let text = printf('[Error] %s:%d: %s : %s',
         \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
   else
-    let text = a:result ? '[OK]    .' :
+    let result = a:result
+    if a:is_not
+      let result = !result
+    endif
+    let text = result ? '[OK]    .' :
           \ printf('[Fail]  %s:%d: It %s : %s',
           \ a:context.file, a:context.linenr, it, a:cond)
   endif
@@ -108,6 +128,10 @@ endfunction"}}}
 
 function! vesting#get_context()"{{{
   return s:context_stack[-1]
+endfunction"}}}
+
+function! s:get_default_context()"{{{
+  return 
 endfunction"}}}
 
 " Restore 'cpoptions' {{{

@@ -77,6 +77,9 @@ vesting
 ==============================================================================
 CHANGELOG					*vesting-changelog*
 
+2012-07-20
+- Added :ShouldNot command.
+
 2012-07-19
 - Improved context stack.
 - Fixed error results.
