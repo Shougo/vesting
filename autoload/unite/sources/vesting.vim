@@ -56,11 +56,32 @@ function! s:source.gather_candidates(args, context)"{{{
     return []
   endif
 
-  let dir = join(a:args, ':')
+  let vests = filter(a:args[1:], "v:val != ''")
+  let dir = a:args[0]
+  let all_vests = map(split(glob(dir . '/vest/*.vim', 1), '\n'),
+          \ "fnamemodify(v:val, ':t:r')")
+  if index(vests, '!') >= 0
+    " Use all vests.
+    let vests = all_vests
+  elseif empty(vests)
+    " Selects vests.
+    return map(all_vests, "{
+          \ 'word' : v:val,
+          \ 'kind' : 'source',
+          \ 'action__source_name' : 'vesting',
+          \ 'action__source_args' : [dir, v:val],
+          \ }")
+  endif
+
   let results = []
   let candidates = []
 
-  for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
+  for vest in map(vests, "dir.'/vest/'.v:val.'.vim'")
+    echomsg vest
+    if !filereadable(vest)
+      continue
+    endif
+
     call vesting#init()
 
     call add(candidates,
@@ -91,8 +112,15 @@ function! s:source.gather_candidates(args, context)"{{{
   return candidates
 endfunction"}}}
 function! s:source.complete(args, context, arglead, cmdline, cursorpos)"{{{
-  return unite#sources#file#complete_directory(
-        \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
+  if len(a:args) <= 1
+    return unite#sources#file#complete_directory(
+          \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
+  else
+    let dir = a:args[0]
+    return map(split(glob(dir . '/vest/'
+          \ . a:args[-1] . '*.vim', 1), '\n'),
+          \ "fnamemodify(v:val, ':t:r')")
+  endif
 endfunction"}}}
 
 let &cpo = s:save_cpo

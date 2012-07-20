@@ -73,6 +73,12 @@ Here let me explain about a source for |unite| provided in vesting.
 							*vesting-unite-source-vesting*
 vesting
 		Nominates vesting result as a candidate.
+		1. the target directory.
+		2. test name.
+		...
+		Note: The test name is Vim script for vesting filename. But
+		the extension is ommited. If test name is omit, this source
+		nominates all tests.
 
 ==============================================================================
 CHANGELOG					*vesting-changelog*
@@ -81,6 +87,8 @@ CHANGELOG					*vesting-changelog*
 - Added :ShouldNot command.
 - Improved for execption.
 - Improved commands definition.
+- Improved vesting source behavior.
+- Implemented source completion.
 
 2012-07-19
 - Improved context stack.
