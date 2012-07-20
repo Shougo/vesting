@@ -58,16 +58,6 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -nargs=+ Raises
-        \ try |
-        \   call eval([<args>][1]) |
-        \ catch |
-        \   if v:exception !~ [<args>][0] |
-        \     call vesting#error(
-        \       { 'linenr' : expand('<slnum>'),
-        \         'file' : expand('<sfile>')}) |
-        \   endif |
-        \ endtry
   command! -nargs=0 End
         \ call vesting#end(
         \   { 'linenr' : expand('<slnum>'),
@@ -98,8 +88,13 @@ endfunction"}}}
 function! vesting#init()"{{{
   let s:results = {}
   let s:context_stack = [
-        \ { 'mode' : 'init', 'args' : 'init',
-        \   'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')}]
+        \ { 'mode' : 'context', 'args' : 'init_context',
+        \   'linenr' : expand('<slnum>'),
+        \   'file' : expand('<sfile>')},
+        \ { 'mode' : 'it', 'args' : 'init_it',
+        \   'linenr' : expand('<slnum>'),
+        \   'file' : expand('<sfile>')},
+        \ ]
 endfunction"}}}
 
 function! vesting#should(result, cond, context, is_not)"{{{
@@ -124,7 +119,6 @@ function! vesting#should(result, cond, context, is_not)"{{{
 endfunction"}}}
 
 function! vesting#error(context)"{{{
-  let it = s:context_stack[-1].args
   let context = s:context_stack[-2].args
   if !has_key(s:results, context)
     let s:results[context] = []
@@ -142,14 +136,14 @@ endfunction"}}}
 function! vesting#context(args, context)"{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'context', 'args' : a:args,
-        \  'execption' : '', 'is_caught' : 0})
+        \ })
   call add(s:context_stack, context)
 endfunction"}}}
 
 function! vesting#it(args, context)"{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'it', 'args' : a:args,
-        \  'execption' : '', 'is_caught' : 0})
+        \ })
   call add(s:context_stack, context)
 endfunction"}}}
 
