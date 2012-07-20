@@ -29,54 +29,76 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-command! -nargs=+ Context
-      \ call vesting#context(<q-args>,
-      \   { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')})
-command! -nargs=+ It
-      \ call vesting#it(<q-args>,
-      \   { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')})
-command! -nargs=+ Should
-      \ try |
-      \   call vesting#should(eval(<q-args>), <q-args>,
-      \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}, 0) |
-      \ catch |
-      \   call vesting#error(
-      \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}) |
-      \ endtry
-command! -nargs=+ ShouldNot
-      \ try |
-      \   call vesting#should(eval(<q-args>), <q-args>,
-      \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}, 1) |
-      \ catch |
-      \   call vesting#error(
-      \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')}) |
-      \ endtry
-command! -nargs=+ Raises
-      \  call vesting#raises(<q-args>,
-      \     { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')})
-command! -nargs=0 End
-      \ call vesting#end(
-      \   { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')})
-command! -nargs=0 Fin
-      \ call vesting#fin(
-      \   { 'linenr' : expand('<slnum>'),
-      \     'file' : expand('<sfile>')})
+function! s:define_commands()"{{{
+  command! -nargs=+ Context
+        \ call vesting#context(<q-args>,
+        \   { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')})
+  command! -nargs=+ It
+        \ call vesting#it(<q-args>,
+        \   { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')})
+  command! -nargs=+ Should
+        \ try |
+        \   call vesting#should(eval(<q-args>), <q-args>,
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}, 0) |
+        \ catch |
+        \   call vesting#error(
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}) |
+        \ endtry
+  command! -nargs=+ ShouldNot
+        \ try |
+        \   call vesting#should(eval(<q-args>), <q-args>,
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}, 1) |
+        \ catch |
+        \   call vesting#error(
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}) |
+        \ endtry
+  command! -nargs=+ Raises
+        \ try |
+        \   call eval([<args>][1]) |
+        \ catch |
+        \   if v:exception !~ [<args>][0] |
+        \     call vesting#error(
+        \       { 'linenr' : expand('<slnum>'),
+        \         'file' : expand('<sfile>')}) |
+        \   endif |
+        \ endtry
+  command! -nargs=0 End
+        \ call vesting#end(
+        \   { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')})
+  command! -nargs=0 Fin
+        \ call vesting#fin(
+        \   { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')})
+endfunction"}}}
+function! s:undefine_commands()"{{{
+  delcommand! Context
+  delcommand! It
+  delcommand! Should
+  delcommand! ShouldNot
+  delcommand! Raises
+  delcommand! End
+  delcommand! Fin
+endfunction"}}}
 
 function! vesting#load()"{{{
+  call s:define_commands()
+endfunction"}}}
+
+function! vesting#clean()"{{{
+  call s:undefine_commands()
 endfunction"}}}
 
 function! vesting#init()"{{{
   let s:results = {}
   let s:context_stack = [
-        \ { 'mode' : '', 'args' : '',
+        \ { 'mode' : 'init', 'args' : 'init',
         \   'linenr' : expand('<slnum>'), 'file' : expand('<sfile>')}]
 endfunction"}}}
 
@@ -96,7 +118,8 @@ function! vesting#should(result, cond, context, is_not)"{{{
         \ a:context.file, a:context.linenr, it, a:cond)
 
   call add(s:results[context],
-        \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
+        \ { 'linenr' : a:context.linenr,
+        \   'file' : a:context.file,
         \   'text' : text })
 endfunction"}}}
 
@@ -108,9 +131,11 @@ function! vesting#error(context)"{{{
   endif
 
   let text = printf('[Error] %s:%d: %s : %s',
-        \ a:context.file, a:context.linenr, v:throwpoint, v:exception)
+        \ a:context.file, a:context.linenr,
+        \ v:throwpoint, v:exception)
   call add(s:results[context],
-        \ { 'linenr' : a:context.linenr, 'file' : a:context.file,
+        \ { 'linenr' : a:context.linenr,
+        \   'file' : a:context.file,
         \   'text' : text })
 endfunction"}}}
 

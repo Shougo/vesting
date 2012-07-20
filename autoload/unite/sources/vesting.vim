@@ -63,7 +63,8 @@ function! s:source.gather_candidates(args, context)"{{{
   for vest in split(glob(dir . '/vest/*.vim', 1), '\n')
     call vesting#init()
 
-    call add(candidates, { 'word' : '[Vest]  ' . vest, 'is_dummy' : 1})
+    call add(candidates,
+          \ { 'word' : '[Vest]  ' . vest, 'is_dummy' : 1})
 
     try
       source `=vest`

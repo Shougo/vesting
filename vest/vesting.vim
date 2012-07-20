@@ -7,12 +7,17 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
+function! s:hoge()
+  throw 'hogera'
+endfunction
+
 Context Vesting.run()
   It check is true?
     Should 1 == 1
     ShouldNot 1 == 0
-    throw 'hoge'
   End
+
+  throw 'hoge'
 End
 
 Fin
