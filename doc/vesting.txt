@@ -83,6 +83,9 @@ vesting
 ==============================================================================
 CHANGELOG					*vesting-changelog*
 
+2012-07-23
+- Added syntax and indent files.
+
 2012-07-20
 - Added :ShouldNot command.
 - Improved for execption.
