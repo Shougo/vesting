@@ -83,7 +83,10 @@ vesting
 ==============================================================================
 CHANGELOG					*vesting-changelog*
 
-2012-07-23
+2012-07-24
+- Improved error catch.
+
+2012-07-22
 - Added syntax and indent files.
 
 2012-07-20

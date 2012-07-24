@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 20 Jul 2012.
+" Last Modified: 24 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -77,7 +77,6 @@ function! s:source.gather_candidates(args, context)"{{{
   let candidates = []
 
   for vest in map(vests, "dir.'/vest/'.v:val.'.vim'")
-    echomsg vest
     if !filereadable(vest)
       continue
     endif
@@ -90,7 +89,13 @@ function! s:source.gather_candidates(args, context)"{{{
     try
       source `=vest`
     catch
-      call vesting#error(vesting#get_context())
+      let context = vesting#get_context()
+      if v:throwpoint =~ 'line \d\+'
+        let context.linenr =
+              \ matchstr(v:throwpoint, 'line \zs\d\+')
+      endif
+
+      call vesting#error(context)
     endtry
 
     let results = []
