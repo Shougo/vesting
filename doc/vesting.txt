@@ -83,6 +83,9 @@ vesting
 ==============================================================================
 CHANGELOG					*vesting-changelog*
 
+2012-07-25
+- Fixed indentation.
+
 2012-07-24
 - Improved error catch.
 

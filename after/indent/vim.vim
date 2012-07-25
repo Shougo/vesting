@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: after/indent/vim.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 22 Jul 2012.
+" Last Modified: 25 Jul 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -28,6 +28,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let &l:indentexpr = 'GetVestingIndent(' . &l:indentexpr . ')'
+setlocal indentkeys+==End
 
 if exists('*GetVestingIndent')
   finish
@@ -41,6 +42,10 @@ function GetVestingIndent(base_indent)
   if line =~#
         \'\%(^\||\)\s*\(Context\|It\)\>'
     let indent += &l:shiftwidth
+  endif
+
+  if !&l:ignorecase && getline(v:lnum) =~# '\<End\>'
+    let indent -= &l:shiftwidth
   endif
 
   return indent
