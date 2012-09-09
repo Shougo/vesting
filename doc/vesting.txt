@@ -83,6 +83,9 @@ vesting
 ==============================================================================
 CHANGELOG					*vesting-changelog*
 
+2012-09-08
+- Set is_multiline.
+
 2012-07-25
 - Fixed indentation.
 
