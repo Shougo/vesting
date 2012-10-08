@@ -42,11 +42,17 @@ INTRODUCTION					*vesting-introduction*
 ==============================================================================
 USAGE						*vesting-usage*
 
+To run test cases under ./vest/*.vim, run the following command.
+
+	:Unite vesting:.
+
 ==============================================================================
 INSTALL						*vesting-install*
 
 Install the distributed files into Vim script directory which is usually
 ~/.vim/, or $HOME/vimfiles on Windows.
+
+This plugin depends on |unite.vim|. Install it in advance.
 
 ==============================================================================
 INTERFACE					*vesting-interface*
@@ -86,6 +92,9 @@ CHANGELOG					*vesting-changelog*
 
 2012-10-08
 - Improved unite source behavior.
+
+2012-10-06
+- More documented.
 
 2012-09-08
 - Set is_multiline.
