@@ -78,10 +78,14 @@ vesting
 		...
 		Note: The test name is Vim script for vesting filename. But
 		the extension is ommited. If test name is omit, this source
-		nominates all tests.
+		nominates all tests. If target directory is omit, use current
+		directory.
 
 ==============================================================================
 CHANGELOG					*vesting-changelog*
+
+2012-10-08
+- Improved unite source behavior.
 
 2012-09-08
 - Set is_multiline.

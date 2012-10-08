@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 09 Sep 2012.
+" Last Modified: 08 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -52,19 +52,27 @@ function! s:source.hooks.on_syntax(args, context)"{{{
   highlight default link uniteSource__VestingFilename Comment
 endfunction"}}}
 function! s:source.gather_candidates(args, context)"{{{
-  if empty(a:args)
-    return []
-  endif
-
   let vests = filter(a:args[1:], "v:val != ''")
-  let dir = a:args[0]
+  let dir = get(a:args, 0, '.')
   let all_vests = map(split(glob(dir . '/vest/*.vim', 1), '\n'),
           \ "fnamemodify(v:val, ':t:r')")
+  if empty(all_vests)
+    " Returns vesting directories.
+    return map(unite#util#uniq(
+          \ map(split(glob(dir . '/*/vest/*.vim', 1), '\n'),
+          \   "fnamemodify(v:val, ':h:h:t')")), "{
+          \   'word' : v:val,
+          \   'kind' : 'source',
+          \   'action__source_name' : 'vesting',
+          \   'action__source_args' : [v:val],
+          \ }")
+  endif
+
   if index(vests, '!') >= 0
-    " Use all vests.
+    " Use all vesting scripts.
     let vests = all_vests
   elseif empty(vests)
-    " Selects vests.
+    " Selects vesting scripts.
     return map(all_vests, "{
           \ 'word' : v:val,
           \ 'kind' : 'source',
