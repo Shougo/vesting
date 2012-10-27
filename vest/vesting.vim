@@ -13,6 +13,8 @@ Context Vesting.run()
     ShouldNot 1 == 0
   End
 
+  P {'hoge'}
+
   throw 'hoge'
 End
 

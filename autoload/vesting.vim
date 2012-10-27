@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 24 Jul 2012.
+" Last Modified: 28 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -30,15 +30,15 @@ set cpo&vim
 " }}}
 
 function! s:define_commands()"{{{
-  command! -nargs=+ Context
+  command! -bar -nargs=+ Context
         \ call vesting#context(<q-args>,
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -nargs=+ It
+  command! -bar -nargs=+ It
         \ call vesting#it(<q-args>,
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -nargs=+ Should
+  command! -bar -nargs=+ Should
         \ try |
         \   call vesting#should(eval(<q-args>), <q-args>,
         \     { 'linenr' : expand('<slnum>'),
@@ -48,7 +48,7 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -nargs=+ ShouldNot
+  command! -bar -nargs=+ ShouldNot
         \ try |
         \   call vesting#should(eval(<q-args>), <q-args>,
         \     { 'linenr' : expand('<slnum>'),
@@ -58,14 +58,17 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -nargs=0 End
+  command! -bar -nargs=0 End
         \ call vesting#end(
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -nargs=0 Fin
+  command! -bar -nargs=0 Fin
         \ call vesting#fin(
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
+
+  command! -bar -nargs=+ -complete=expression P
+        \ echomsg string(<args>)
 endfunction"}}}
 function! s:undefine_commands()"{{{
   delcommand! Context
@@ -75,6 +78,7 @@ function! s:undefine_commands()"{{{
   delcommand! Raises
   delcommand! End
   delcommand! Fin
+  delcommand! P
 endfunction"}}}
 
 function! vesting#load()"{{{
