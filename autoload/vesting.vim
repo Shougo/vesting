@@ -58,6 +58,28 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
+  command! -bar -nargs=+ ShouldEqual
+        \ try |
+        \   call vesting#should_equal(
+        \     eval('[' . <q-args> . ']'), '['.<q-args>.']',
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}, 0) |
+        \ catch |
+        \   call vesting#error(
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}) |
+        \ endtry
+  command! -bar -nargs=+ ShouldNotEqual
+        \ try |
+        \   call vesting#should_equal(
+        \     eval('[' . <q-args> . ']'), '['.<q-args>.']',
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}, 1) |
+        \ catch |
+        \   call vesting#error(
+        \     { 'linenr' : expand('<slnum>'),
+        \     'file' : expand('<sfile>')}) |
+        \ endtry
   command! -bar -nargs=0 End
         \ call vesting#end(
         \   { 'linenr' : expand('<slnum>'),
@@ -75,6 +97,8 @@ function! s:undefine_commands()"{{{
   delcommand! It
   delcommand! Should
   delcommand! ShouldNot
+  delcommand! ShouldEqual
+  delcommand! ShouldNotEqual
   delcommand! Raises
   delcommand! End
   delcommand! Fin
@@ -115,6 +139,32 @@ function! vesting#should(result, cond, context, is_not)"{{{
   let text = result ? '[OK]    .' :
         \ printf('[Fail]  %s:%d: It %s : %s',
         \ a:context.file, a:context.linenr, it, a:cond)
+
+  call add(s:results[context],
+        \ { 'linenr' : a:context.linenr,
+        \   'file' : a:context.file,
+        \   'text' : text })
+endfunction"}}}
+
+function! vesting#should_equal(result, cond, context, is_not)"{{{
+  let lhs = a:result[0]
+  let rhs = a:result[1]
+
+  let it = s:context_stack[-1].args
+  let context = s:context_stack[-2].args
+  if !has_key(s:results, context)
+    let s:results[context] = []
+  endif
+
+  let result = lhs ==# rhs
+  if a:is_not
+    let result = !result
+  endif
+  echomsg string(a:cond)
+  let text = result ? '[OK]    .' :
+        \ printf('[Fail]  %s:%d: It %s : But %s %s %s',
+        \ a:context.file, a:context.linenr, it,
+        \ a:cond[0], (a:is_not ? 'equal' : 'not equal'), a:cond[1])
 
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr,

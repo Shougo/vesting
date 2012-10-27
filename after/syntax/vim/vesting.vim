@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: after/syntax/vim/vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 22 Jul 2012.
+" Last Modified: 28 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -27,9 +27,15 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-syntax keyword vimVestingCommand End Context It Should ShouldNot Fin
+syntax keyword vimVestingCommand
+      \ End Context Should ShouldNot ShouldEqual ShouldNotEqual Fin P
+
+syntax match   vimVestingItLine     '\<It.*$'
+syntax match   vimVestingCommand     '\<It' contained containedin=vimVestingItLine
+syntax match   vimVestingIt ' .*$' contained containedin=vimVestingItLine
 
 highlight default link vimVestingCommand  vimCommand
+highlight default link vimVestingIt  vimComment
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
