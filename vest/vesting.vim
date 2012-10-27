@@ -12,16 +12,12 @@ Context Vesting.run()
     Should 1 == 1
     ShouldNot 1 == 0
     ShouldEqual 1, 1
-    ShouldEqual 1, 0
     ShouldNotEqual 1, 0
   End
 
   It check is not true
-    Should 1 == 1
-    ShouldNot 1 == 0
-    ShouldEqual 1, 1
     ShouldEqual 1, 0
-    ShouldNotEqual 1, 0
+    ShouldNotEqual 0, 0
   End
 
   P {'hoge'}

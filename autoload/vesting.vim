@@ -160,11 +160,11 @@ function! vesting#should_equal(result, cond, context, is_not)"{{{
   if a:is_not
     let result = !result
   endif
-  echomsg string(a:cond)
   let text = result ? '[OK]    .' :
-        \ printf('[Fail]  %s:%d: It %s : But %s %s %s',
-        \ a:context.file, a:context.linenr, it,
-        \ a:cond[0], (a:is_not ? 'equal' : 'not equal'), a:cond[1])
+        \ printf('[Fail]  %s:%d: It %s : %s %s %s',
+        \   a:context.file, a:context.linenr, it,
+        \   string(a:result[0]), (a:is_not ? '==' : '!='),
+        \   string(a:result[1]))
 
   call add(s:results[context],
         \ { 'linenr' : a:context.linenr,
