@@ -115,6 +115,7 @@ endfunction"}}}
 
 function! vesting#init()"{{{
   let s:results = {}
+  let s:errored = 0
   let s:context_stack = [
         \ { 'mode' : 'context', 'args' : 'init_context',
         \   'linenr' : expand('<slnum>'),

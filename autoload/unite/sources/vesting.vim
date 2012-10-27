@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 08 Oct 2012.
+" Last Modified: 28 Oct 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -108,9 +108,22 @@ function! s:source.gather_candidates(args, context)"{{{
 
     let results = []
 
+    let [ok, fail, error] = [0, 0, 0]
     for result  in values(vesting#get_result())
       let results += result
+
+      let ok += len(filter(copy(result),
+            \ "v:val.text =~# '^\\[OK\\]'"))
+      let fail += len(filter(copy(result),
+            \ "v:val.text =~# '^\\[Fail\\]'"))
+      let error += len(filter(copy(result),
+            \ "v:val.text =~# '^\\[Error\\]'"))
     endfor
+
+    call unite#print_source_message(
+          \ printf('%s: OK = %s, Fail = %s, Error = %s',
+          \   vest, ok, fail, error),
+          \ s:source.name)
 
     let candidates += map(results, "{
           \ 'word': v:val.text,
