@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: vesting.vim
 " AUTHOR: Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 28 Oct 2012.
+" Last Modified: 08 Dec 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -30,15 +30,15 @@ set cpo&vim
 " }}}
 
 function! s:define_commands()"{{{
-  command! -bar -nargs=+ Context
+  command! -nargs=+ Context
         \ call vesting#context(<q-args>,
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -bar -nargs=+ It
+  command! -nargs=+ It
         \ call vesting#it(<q-args>,
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -bar -nargs=+ Should
+  command! -nargs=+ Should
         \ try |
         \   call vesting#should(eval(<q-args>), <q-args>,
         \     { 'linenr' : expand('<slnum>'),
@@ -48,7 +48,7 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -bar -nargs=+ ShouldNot
+  command! -nargs=+ ShouldNot
         \ try |
         \   call vesting#should(eval(<q-args>), <q-args>,
         \     { 'linenr' : expand('<slnum>'),
@@ -58,7 +58,7 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -bar -nargs=+ ShouldEqual
+  command! -nargs=+ ShouldEqual
         \ try |
         \   call vesting#should_equal(
         \     eval('[' . <q-args> . ']'), '['.<q-args>.']',
@@ -69,7 +69,7 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -bar -nargs=+ ShouldNotEqual
+  command! -nargs=+ ShouldNotEqual
         \ try |
         \   call vesting#should_equal(
         \     eval('[' . <q-args> . ']'), '['.<q-args>.']',
@@ -80,16 +80,16 @@ function! s:define_commands()"{{{
         \     { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')}) |
         \ endtry
-  command! -bar -nargs=0 End
+  command! -nargs=0 End
         \ call vesting#end(
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
-  command! -bar -nargs=0 Fin
+  command! -nargs=0 Fin
         \ call vesting#fin(
         \   { 'linenr' : expand('<slnum>'),
         \     'file' : expand('<sfile>')})
 
-  command! -bar -nargs=+ -complete=expression P
+  command! -nargs=+ -complete=expression P
         \ echomsg string(<args>)
 endfunction"}}}
 function! s:undefine_commands()"{{{
