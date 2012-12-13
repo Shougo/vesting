@@ -27,7 +27,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! unite#sources#vesting#define()"{{{
+function! unite#sources#vesting#define() "{{{
   call vesting#load()
   return s:source
 endfunction"}}}
@@ -39,10 +39,10 @@ let s:source = {
       \ 'syntax' : 'uniteSource__Vesting',
       \}
 
-function! s:source.hooks.on_init(args, context)"{{{
+function! s:source.hooks.on_init(args, context) "{{{
   call vesting#load()
 endfunction"}}}
-function! s:source.hooks.on_syntax(args, context)"{{{
+function! s:source.hooks.on_syntax(args, context) "{{{
   syntax match uniteSource__VestingError /.*:.*$/
         \ contained containedin=uniteSource__Vesting
   highlight default link uniteSource__VestingError ErrorMsg
@@ -51,7 +51,7 @@ function! s:source.hooks.on_syntax(args, context)"{{{
         \ contained containedin=uniteSource__Vesting
   highlight default link uniteSource__VestingFilename Comment
 endfunction"}}}
-function! s:source.gather_candidates(args, context)"{{{
+function! s:source.gather_candidates(args, context) "{{{
   let vests = filter(a:args[1:], "v:val != ''")
   let dir = get(a:args, 0, '.')
   let all_vests = map(split(glob(dir . '/vest/*.vim', 1), '\n'),
@@ -138,7 +138,7 @@ function! s:source.gather_candidates(args, context)"{{{
 
   return candidates
 endfunction"}}}
-function! s:source.complete(args, context, arglead, cmdline, cursorpos)"{{{
+function! s:source.complete(args, context, arglead, cmdline, cursorpos) "{{{
   if len(a:args) <= 1
     return unite#sources#file#complete_directory(
           \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)

@@ -29,7 +29,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 " }}}
 
-function! s:define_commands()"{{{
+function! s:define_commands() "{{{
   command! -nargs=+ Context
         \ call vesting#context(<q-args>,
         \   { 'linenr' : expand('<slnum>'),
@@ -92,7 +92,7 @@ function! s:define_commands()"{{{
   command! -nargs=+ -complete=expression P
         \ echomsg string(<args>)
 endfunction"}}}
-function! s:undefine_commands()"{{{
+function! s:undefine_commands() "{{{
   delcommand! Context
   delcommand! It
   delcommand! Should
@@ -105,15 +105,15 @@ function! s:undefine_commands()"{{{
   delcommand! P
 endfunction"}}}
 
-function! vesting#load()"{{{
+function! vesting#load() "{{{
   call s:define_commands()
 endfunction"}}}
 
-function! vesting#clean()"{{{
+function! vesting#clean() "{{{
   call s:undefine_commands()
 endfunction"}}}
 
-function! vesting#init()"{{{
+function! vesting#init() "{{{
   let s:results = {}
   let s:errored = 0
   let s:context_stack = [
@@ -126,7 +126,7 @@ function! vesting#init()"{{{
         \ ]
 endfunction"}}}
 
-function! vesting#should(result, cond, context, is_not)"{{{
+function! vesting#should(result, cond, context, is_not) "{{{
   let it = s:context_stack[-1].args
   let context = s:context_stack[-2].args
   if !has_key(s:results, context)
@@ -147,7 +147,7 @@ function! vesting#should(result, cond, context, is_not)"{{{
         \   'text' : text })
 endfunction"}}}
 
-function! vesting#should_equal(result, cond, context, is_not)"{{{
+function! vesting#should_equal(result, cond, context, is_not) "{{{
   let lhs = a:result[0]
   let rhs = a:result[1]
 
@@ -173,7 +173,7 @@ function! vesting#should_equal(result, cond, context, is_not)"{{{
         \   'text' : text })
 endfunction"}}}
 
-function! vesting#error(context)"{{{
+function! vesting#error(context) "{{{
   let context = s:context_stack[-2].args
   if !has_key(s:results, context)
     let s:results[context] = []
@@ -188,21 +188,21 @@ function! vesting#error(context)"{{{
         \   'text' : text })
 endfunction"}}}
 
-function! vesting#context(args, context)"{{{
+function! vesting#context(args, context) "{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'context', 'args' : a:args,
         \ })
   call add(s:context_stack, context)
 endfunction"}}}
 
-function! vesting#it(args, context)"{{{
+function! vesting#it(args, context) "{{{
   let context = extend(copy(a:context),
         \ {'mode' : 'it', 'args' : a:args,
         \ })
   call add(s:context_stack, context)
 endfunction"}}}
 
-function! vesting#end(context)"{{{
+function! vesting#end(context) "{{{
   call remove(s:context_stack, -1)
   redraw!
 endfunction"}}}
@@ -210,11 +210,11 @@ endfunction"}}}
 function! vesting#fin(context)
 endfunction
 
-function! vesting#get_result()"{{{
+function! vesting#get_result() "{{{
   return s:results
 endfunction"}}}
 
-function! vesting#get_context()"{{{
+function! vesting#get_context() "{{{
   return s:context_stack[-1]
 endfunction"}}}
 
